@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOODPICKER ITF</title>
+
+  <!-- ฟอนต์ Prompt จาก Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Prompt', Tahoma, sans-serif;
+      background: linear-gradient(160deg, #fff5f3, #ffe9e4);
+      color: #3b2b2b;
+    }
+
+    /* Navbar ด้านบนสุด */
+    .navbar {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px;
+      background-color: #ec5f59;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .navbar .nav-title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .navbar .nav-side {
+      font-size: 14px;
+      min-width: 90px;
+    }
+
+    .navbar .nav-side:last-child {
+      text-align: right;
+    }
+
+    /* ส่วนกลางหน้าเว็บ */
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 16px;
+    }
+
+    .food-card {
+      width: 340px;
+      max-width: 100%;
+      padding: 22px;
+      border-radius: 20px;
+      background-color: #ffffff;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(236, 95, 89, 0.2);
+    }
+
+    .food-image {
+      width: 100%;
+      height: 220px;
+      border-radius: 14px;
+      background-color: #fff0ee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .food-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* แสดงอีโมจิแทนรูป ถ้าโหลดรูปไม่ได้ */
+    .food-image .emoji {
+      font-size: 90px;
+    }
+
+    #food-name {
+      margin: 18px 0 6px;
+      color: #ec5f59;
+      font-size: 26px;
+    }
+
+    #food-desc {
+      margin: 0 0 14px;
+      color: #7a6a6a;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    #food-price {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background-color: #ffe1de;
+      color: #c0392b;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* ปุ่มสุ่ม */
+    #random-btn {
+      width: 340px;
+      max-width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: none;
+      border-radius: 999px;
+      background-color: #ec5f59;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(236, 95, 89, 0.4);
+      transition: transform 0.15s, background-color 0.15s;
+    }
+
+    #random-btn:hover {
+      background-color: #d94943;
+      transform: translateY(-2px);
+    }
+
+    #random-btn:active {
+      transform: translateY(0);
+    }
+
+    .fade {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <span class="nav-side">69070074</span>
+    <span class="nav-title">FOODPICKER ITF</span>
+    <span class="nav-side">Week15</span>
+  </nav>
+
+  <main>
+    <!-- ส่วนแสดงข้อมูลอาหาร -->
+    <div class="food-card" id="food-card">
+      <div class="food-image" id="food-image"></div>
+      <h2 id="food-name">กดปุ่มเพื่อสุ่มเมนู</h2>
+      <p id="food-desc">วันนี้กินอะไรดี?</p>
+      <span id="food-price">ราคา - บาท</span>
+    </div>
+
+    <!-- ปุ่มสุ่ม -->
+    <button id="random-btn" type="button">สุ่มเมนูอาหาร</button>
+  </main>
+
+  <script>
+    // รายการอาหาร (มากกว่า 5 รายการ)
+    // image = ไฟล์รูปในโฟลเดอร์ images/ (ถ้าไม่มีไฟล์ จะแสดงอีโมจิแทน)
+    const foods = [
+      {
+        name: "ข้าวมันไก่",
+        desc: "เนื้อไก่ชุ่มฉ่ำ หอมมัน เสิร์ฟพร้อมน้ำจิ้มรสเด็ด",
+        price: "50-65",
+        image: "khaomunkai.jpg"
+      },
+      {
+        name: "ผัดกะเพราหมูสับไข่ดาว",
+        desc: "ผัดร้อนๆ หอมใบกะเพรา เผ็ดจัดจ้าน ไข่ดาวกรอบๆ",
+        price: "50-60",
+        image: "krapao.jpg"
+      },
+      {
+        name: "ก๋วยเตี๋ยวเรือ",
+        desc: "น้ำซุปเข้มข้น เนื้อนุ่ม เครื่องแน่นทุกชาม",
+        price: "40-60",
+        image: "kuayteowruea.jpg"
+      },
+      {
+        name: "ส้มตำไทย",
+        desc: "เปรี้ยว หวาน เผ็ด กรอบสดชื่น กินกับไก่ย่างอร่อยสุด",
+        price: "40-60",
+        image: "somtam.jpg"
+      },
+      {
+        name: "ข้าวผัดปู",
+        desc: "ข้าวผัดหอมกระทะ เนื้อปูแน่นๆ เสิร์ฟพร้อมพริกน้ำปลา",
+        price: "60-90",
+        image: "khaophatpu.jpg"
+      },
+      {
+        name: "ต้มยำกุ้ง",
+        desc: "น้ำข้นหรือน้ำใส รสจัดจ้าน หอมสมุนไพร กุ้งตัวโต",
+        price: "120-180",
+        image: "tomyum.jpg"
+      }
+    ];
+
+    const foodImage = document.getElementById("food-image");
+    const foodName = document.getElementById("food-name");
+    const foodDesc = document.getElementById("food-desc");
+    const foodPrice = document.getElementById("food-price");
+    const foodCard = document.getElementById("food-card");
+    const randomBtn = document.getElementById("random-btn");
+
+    let lastIndex = -1; // จำเมนูล่าสุด จะได้ไม่สุ่มซ้ำติดกัน
+
+    // แสดงรูป ถ้าโหลดไม่ได้ให้ใช้อีโมจิแทน
+    function showImage(food) {
+      foodImage.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = food.image;
+      img.alt = food.name;
+      img.onerror = function () {
+        foodImage.innerHTML = '<span class="emoji">' + food.emoji + "</span>";
+      };
+      foodImage.appendChild(img);
+    }
+
+    // แสดงข้อมูลอาหารตามลำดับที่ส่งมา
+    function showFood(index) {
+      const food = foods[index];
+      showImage(food);
+      foodName.textContent = food.name;
+      foodDesc.textContent = food.desc;
+      foodPrice.textContent = "ราคา " + food.price + " บาท";
+
+      // เล่นแอนิเมชันทุกครั้งที่เปลี่ยนเมนู
+      foodCard.classList.remove("fade");
+      void foodCard.offsetWidth;
+      foodCard.classList.add("fade");
+    }
+
+    // สุ่มเมนู (ไม่ซ้ำกับครั้งก่อน)
+    function randomFood() {
+      let index;
+      do {
+        index = Math.floor(Math.random() * foods.length);
+      } while (index === lastIndex);
+      lastIndex = index;
+      showFood(index);
+    }
+
+    randomBtn.addEventListener("click", randomFood);
+
+    // สุ่มให้เห็น 1 เมนูตั้งแต่เปิดหน้าเว็บ
+    randomFood();
+  </script>
+</body>
+</html>
